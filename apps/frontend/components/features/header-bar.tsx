@@ -1,14 +1,15 @@
 "use client";
 
-import { CircleCheck, Download, Save } from "lucide-react";
+import { CircleCheck, Download, Save, ArrowLeft } from "lucide-react";
 import { InputGroup } from "../ui/input-group";
-import { Button } from "../ui/button";
+import { Button, IconButton } from "../ui/button";
 
 interface HeaderBarProps {
   reportName: string;
   onReportNameChange?: (value: string) => void;
   onExport?: () => void;
   onSave?: () => void;
+  onBack?: () => void;
 }
 
 export function HeaderBar({
@@ -16,9 +17,17 @@ export function HeaderBar({
   onReportNameChange,
   onExport,
   onSave,
+  onBack,
 }: HeaderBarProps) {
   return (
     <header className="flex items-center gap-6 h-16 px-8 py-3 bg-[var(--card)] border-b border-[var(--border)]">
+      {onBack && (
+        <IconButton
+          icon={<ArrowLeft className="w-5 h-5 text-[var(--foreground)]" />}
+          onClick={onBack}
+          className="mr-2"
+        />
+      )}
       <InputGroup
         value={reportName}
         onChange={onReportNameChange}

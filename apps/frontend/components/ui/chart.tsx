@@ -8,11 +8,12 @@ interface LegendItem {
 interface ChartProps {
   legends: LegendItem[];
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export function LineChart({ legends, className = "" }: ChartProps) {
+export function LineChart({ legends, className = "", style }: ChartProps) {
   return (
-    <div className={`flex flex-col h-full bg-[var(--background)] rounded ${className}`}>
+    <div className={`flex flex-col h-full bg-[var(--background)] rounded ${className}`} style={style}>
       {/* Legend */}
       <div className="flex gap-4 p-4">
         {legends.map((item, index) => (

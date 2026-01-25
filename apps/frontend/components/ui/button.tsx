@@ -69,7 +69,7 @@ export function Button({
 interface IconButtonProps {
   icon: ReactNode;
   variant?: "ghost";
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
   className?: string;
 }
 

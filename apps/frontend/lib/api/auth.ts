@@ -2,22 +2,62 @@
  * 认证 API
  */
 
-import { fetchApi, fetchApiAuth } from "./config";
+import { fetchApi, fetchApiAuth, fetchWebApi, fetchWebApiAuth } from './config';
 
 // ==================== 类型定义 ====================
+
+// 管理员认证类型
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  user: {
+    id: number;
+    username: string;
+    nickname: string | null;
+    email: string | null;
+    avatar: string | null;
+    is_superuser: boolean;
+    roles: string[];
+  };
+}
+
+export interface LogoutResponse {
+  message: string;
+}
+
+// 普通用户认证类型
+export interface UserLoginRequest {
+  phone: string;
+  password: string;
+}
+
+export interface UserLoginResponse {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  user: {
+    id: number;
+    phone: string;
+    nickname: string | null;
+    email: string | null;
+    avatar: string | null;
+    status: number;
+  };
+}
 
 export interface UserRegisterRequest {
   phone: string;
   password: string;
-  invite_code: string;
+  invite_code?: string;
   username?: string;
   nickname?: string;
   email?: string;
-}
-
-export interface UserLoginRequest {
-  phone: string;
-  password: string;
 }
 
 export interface TokenResponse {
@@ -65,7 +105,44 @@ export interface CaptchaVerifyResponse {
   token: string | null;
 }
 
-// ==================== API 函数 ====================
+// ==================== 管理员认证 API ====================
+
+/**
+ * 管理员登录
+ */
+export async function adminLogin(data: LoginRequest): Promise<LoginResponse> {
+  return fetchApi<LoginResponse>('/api/v1/admin-auth/login', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * 管理员登出
+ */
+export async function adminLogout(token: string): Promise<LogoutResponse> {
+  return fetchApiAuth<LogoutResponse>('/api/v1/admin-auth/logout', token, {
+    method: 'POST',
+  });
+}
+
+/**
+ * 获取当前管理员信息
+ */
+export async function getAdminUser(token: string): Promise<LoginResponse['user']> {
+  return fetchApiAuth<LoginResponse['user']>('/api/v1/admin-auth/me', token);
+}
+
+/**
+ * 刷新管理员 Token
+ */
+export async function refreshAdminToken(token: string): Promise<{ access_token: string }> {
+  return fetchApiAuth<{ access_token: string }>('/api/v1/admin-auth/refresh', token, {
+    method: 'POST',
+  });
+}
+
+// ==================== 普通用户认证 API ====================
 
 /**
  * 用户登录
@@ -146,4 +223,42 @@ export async function verifyCaptcha(data: CaptchaVerifyRequest): Promise<Captcha
     method: "POST",
     body: JSON.stringify(data),
   });
+}
+
+// ==================== Web API 用户认证（备用） ====================
+
+/**
+ * 普通用户登录（手机号 + 密码）- Web API
+ */
+export async function userLogin(data: UserLoginRequest): Promise<UserLoginResponse> {
+  return fetchWebApi<UserLoginResponse>('/api/v1/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * 普通用户注册（返回 token）- Web API
+ */
+export async function userRegister(data: UserRegisterRequest): Promise<TokenResponse> {
+  return fetchWebApi<TokenResponse>('/api/v1/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * 普通用户登出 - Web API
+ */
+export async function userLogout(token: string): Promise<LogoutResponse> {
+  return fetchWebApiAuth<LogoutResponse>('/api/v1/auth/logout', token, {
+    method: 'POST',
+  });
+}
+
+/**
+ * 获取当前普通用户信息 - Web API
+ */
+export async function getUserProfile(token: string): Promise<UserLoginResponse['user']> {
+  return fetchWebApiAuth<UserLoginResponse['user']>('/api/v1/auth/me', token);
 }
