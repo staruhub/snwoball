@@ -38,6 +38,62 @@ export interface CreateReportParams {
   templateId?: string;
 }
 
+// ==================== 报告内容类型 ====================
+
+export interface ModuleInstance {
+  id: string;
+  moduleType: string;
+  title: string;
+  order: number;
+  height: number;
+  isLocked: boolean;
+  config: Record<string, unknown>;
+}
+
+export interface DateRange {
+  type: "since_inception" | "1y" | "3y" | "5y" | "ytd" | "custom";
+  startDate: string | null;
+  endDate: string | null;
+}
+
+export interface GlobalFilters {
+  fundId: string | null;
+  fundName: string | null;
+  benchmarkId: string | null;
+  benchmarkName: string | null;
+  dateRange: DateRange;
+  frequency: "daily" | "weekly" | "monthly";
+  navType: "adjusted" | "unit" | "cumulative";
+}
+
+export interface ReportConfig {
+  theme: "light" | "dark";
+  primaryColor: string;
+  fontFamily: string;
+  fontSize: "small" | "medium" | "large";
+  showPageNumbers: boolean;
+  showTableOfContents: boolean;
+}
+
+export interface ReportContent {
+  modules: ModuleInstance[];
+  globalFilters: GlobalFilters;
+  reportConfig: ReportConfig;
+}
+
+export interface UpdateReportParams {
+  name?: string;
+  fundId?: string;
+  fundName?: string;
+  status?: "draft" | "completed";
+  content?: ReportContent;
+  thumbnailUrl?: string;
+}
+
+export interface ReportWithContent extends Report {
+  content?: ReportContent;
+}
+
 // ==================== 后端响应类型 ====================
 
 interface BackendReportItem {
@@ -73,6 +129,13 @@ function transformBackendReport(r: BackendReportItem): Report {
     createdAt: r.create_time,
     updatedAt: r.update_time,
     thumbnailUrl: r.thumbnail_url || undefined,
+  };
+}
+
+function transformBackendReportWithContent(r: BackendReportItem): ReportWithContent {
+  return {
+    ...transformBackendReport(r),
+    content: r.content as ReportContent | undefined,
   };
 }
 
@@ -123,6 +186,44 @@ export async function getReport(id: string): Promise<Report | null> {
   } catch {
     return null;
   }
+}
+
+/**
+ * 获取单个报告（包含完整内容）
+ */
+export async function getReportWithContent(id: string): Promise<ReportWithContent | null> {
+  try {
+    const response = await fetchApi<BackendReportItem>(
+      `/api/v1/user-reports/${id}`
+    );
+    return transformBackendReportWithContent(response);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 更新报告
+ */
+export async function updateReport(
+  id: string,
+  params: UpdateReportParams
+): Promise<Report> {
+  const response = await fetchApi<BackendReportItem>(
+    `/api/v1/user-reports/${id}`,
+    {
+      method: "PUT",
+      body: JSON.stringify({
+        name: params.name,
+        fund_id: params.fundId ? parseInt(params.fundId, 10) : undefined,
+        fund_name: params.fundName,
+        status: params.status,
+        content: params.content,
+        thumbnail_url: params.thumbnailUrl,
+      }),
+    }
+  );
+  return transformBackendReport(response);
 }
 
 /**

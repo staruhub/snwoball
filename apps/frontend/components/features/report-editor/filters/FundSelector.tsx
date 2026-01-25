@@ -1,32 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Search, Star, Clock, Filter, ChevronDown, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Star, Clock, Filter, ChevronDown, Check, Loader2, RefreshCw } from 'lucide-react';
 import { useGlobalFiltersStore } from '@/stores';
+import { useFunds, useDebounce } from '@/hooks';
 
-interface Fund {
-  id: string;
-  name: string;
-  code: string;
-  type: string;
-}
-
-// 示例数据 - 仅在开发环境使用
-const SAMPLE_FUNDS: Fund[] = [
-  { id: '1', name: '易方达蓝筹精选混合', code: '005827', type: '混合型' },
-  { id: '2', name: '招商中证白酒指数', code: '161725', type: '指数型' },
-  { id: '3', name: '天弘中证500指数', code: '000961', type: '指数型' },
-  { id: '4', name: '景顺长城新兴成长混合', code: '260108', type: '混合型' },
-  { id: '5', name: '富国天惠成长混合', code: '161005', type: '混合型' },
-];
-
-// 获取基金列表 - 开发环境使用示例数据
-const getFunds = (): Fund[] => {
-  // TODO: 生产环境应从 API 获取
-  if (process.env.NODE_ENV === 'development') {
-    return SAMPLE_FUNDS;
-  }
-  return SAMPLE_FUNDS; // 暂时返回示例数据，待 API 接入后替换
+// 基金类型映射
+const FUND_TYPE_MAP: Record<number, string> = {
+  1: '股票型',
+  2: '混合型',
+  3: '债券型',
+  4: '指数型',
+  5: '货币型',
+  6: 'QDII',
+  7: 'FOF',
 };
 
 type TabType = 'search' | 'recent' | 'favorite' | 'type';
@@ -36,27 +23,19 @@ export function FundSelector() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('search');
   const [searchQuery, setSearchQuery] = useState('');
-  const [funds] = useState<Fund[]>(() => getFunds());
-  const [filteredFunds, setFilteredFunds] = useState<Fund[]>(funds);
 
-  // 搜索过滤
-  useEffect(() => {
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      setFilteredFunds(
-        funds.filter(
-          (f) =>
-            f.name.toLowerCase().includes(query) ||
-            f.code.includes(query)
-        )
-      );
-    } else {
-      setFilteredFunds(funds);
-    }
-  }, [searchQuery, funds]);
+  // 使用防抖搜索
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
-  const handleSelectFund = (fund: Fund) => {
-    setFund(fund.id, fund.name);
+  // 使用真实 API 获取基金列表
+  const { funds, isLoading, isError, refetch } = useFunds({
+    keyword: debouncedSearch,
+    pageSize: 50,
+    enabled: isOpen, // 仅在下拉框打开时获取数据
+  });
+
+  const handleSelectFund = (fundId: string, fundName: string) => {
+    setFund(fundId, fundName);
     setIsOpen(false);
     setSearchQuery('');
   };
@@ -131,13 +110,36 @@ export function FundSelector() {
 
             {/* 基金列表 */}
             <div className="max-h-64 overflow-y-auto">
-              {filteredFunds.length > 0 ? (
-                filteredFunds.map((fund) => (
+              {/* 加载状态 */}
+              {isLoading && (
+                <div className="py-8 flex flex-col items-center justify-center text-gray-400">
+                  <Loader2 className="w-6 h-6 animate-spin mb-2" />
+                  <span className="text-sm">加载中...</span>
+                </div>
+              )}
+
+              {/* 错误状态 */}
+              {isError && !isLoading && (
+                <div className="py-8 flex flex-col items-center justify-center text-gray-400">
+                  <span className="text-sm mb-2">加载失败</span>
+                  <button
+                    onClick={() => refetch()}
+                    className="flex items-center gap-1 px-3 py-1 text-sm text-blue-500 hover:text-blue-600"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    重试
+                  </button>
+                </div>
+              )}
+
+              {/* 基金列表 */}
+              {!isLoading && !isError && funds.length > 0 && (
+                funds.map((fund) => (
                   <button
                     key={fund.id}
-                    onClick={() => handleSelectFund(fund)}
+                    onClick={() => handleSelectFund(String(fund.id), fund.name)}
                     className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors ${
-                      filters.fundId === fund.id ? 'bg-blue-50' : ''
+                      filters.fundId === String(fund.id) ? 'bg-blue-50' : ''
                     }`}
                   >
                     <div className="flex-1 text-left">
@@ -147,16 +149,19 @@ export function FundSelector() {
                       <div className="text-xs text-gray-500 flex items-center gap-2">
                         <span>{fund.code}</span>
                         <span className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">
-                          {fund.type}
+                          {FUND_TYPE_MAP[fund.fund_type] || '其他'}
                         </span>
                       </div>
                     </div>
-                    {filters.fundId === fund.id && (
+                    {filters.fundId === String(fund.id) && (
                       <Check className="w-4 h-4 text-blue-500" />
                     )}
                   </button>
                 ))
-              ) : (
+              )}
+
+              {/* 空状态 */}
+              {!isLoading && !isError && funds.length === 0 && (
                 <div className="py-8 text-center text-gray-400 text-sm">
                   未找到匹配的基金
                 </div>
