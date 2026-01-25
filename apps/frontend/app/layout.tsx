@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ToastProvider } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: "基金报告系统",
@@ -19,7 +20,9 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="h-full font-primary">{children}</body>
+      <body className="h-full font-primary">
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
   );
 }

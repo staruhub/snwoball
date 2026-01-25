@@ -4,16 +4,28 @@ interface SwitchProps {
   checked: boolean;
   onChange?: (checked: boolean) => void;
   label?: string;
+  disabled?: boolean;
+  className?: string;
 }
 
-export function Switch({ checked, onChange, label }: SwitchProps) {
+export function Switch({
+  checked,
+  onChange,
+  label,
+  disabled = false,
+  className = "",
+}: SwitchProps) {
   return (
-    <div className="flex items-center gap-3">
+    <div className={`flex items-center gap-3 ${className}`}>
       <button
-        onClick={() => onChange?.(!checked)}
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        disabled={disabled}
+        onClick={() => !disabled && onChange?.(!checked)}
         className={`relative w-8 h-5 rounded-full transition-colors ${
           checked ? "bg-[var(--primary)]" : "bg-[var(--input)]"
-        }`}
+        } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
       >
         <div
           className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-transform ${

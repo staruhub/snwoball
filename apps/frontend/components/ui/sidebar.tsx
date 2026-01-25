@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   FileText,
   TrendingUp,
@@ -17,9 +17,11 @@ import {
 import {
   moduleRegistry,
   MODULE_CATEGORIES,
-  type ModuleDefinition,
   type ModuleCategory,
 } from "@/lib/modules";
+
+// 导入所有模块以触发注册 - 必须在使用 moduleRegistry 之前
+import "@/components/modules";
 
 // 分类图标映射
 const categoryIcons: Record<ModuleCategory, React.ReactNode> = {
@@ -45,14 +47,15 @@ export function Sidebar({ onModuleAdd }: SidebarProps) {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(["product-info", "return-stats"])
   );
-  const [groupedModules, setGroupedModules] = useState<
-    Map<ModuleCategory, ModuleDefinition[]>
-  >(new Map());
 
-  // 加载模块分组
-  useEffect(() => {
-    setGroupedModules(moduleRegistry.getGroupedModules());
-  }, []);
+  // 使用 useState 初始化获取模块分组（语义更精确，表示一次性计算）
+  const [groupedModules] = useState(() => {
+    const modules = moduleRegistry.getGroupedModules();
+    if (process.env.NODE_ENV === "development" && modules.size === 0) {
+      console.warn("[Sidebar] No modules registered - check module imports");
+    }
+    return modules;
+  });
 
   const toggleCategory = (category: string) => {
     setExpandedCategories((prev) => {

@@ -47,6 +47,8 @@ logs/
 htmlcov/
 .pytest_cache/
 .tox/
+e2e-test-results/
+playwright-report/
 
 # Docker
 docker-compose.override.yml
@@ -57,3 +59,23 @@ docker-compose.override.yml
 # misc
 *.pem
 ._*
+
+# AI Tools
+.agent/
+.agents/
+.claude/
+.codex/
+.cursor/
+.factory/
+.gemini/
+.kiro/
+.opencode/
+.qoder/
+.trae/
+.windsurf/
+
+# Test screenshots
+*.png
+
+# TypeScript build info
+*.tsbuildinfo

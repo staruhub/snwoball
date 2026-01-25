@@ -6,6 +6,7 @@ interface InputGroupProps {
   onChange?: (value: string) => void;
   placeholder?: string;
   className?: string;
+  type?: string;
 }
 
 export function InputGroup({
@@ -14,6 +15,7 @@ export function InputGroup({
   onChange,
   placeholder,
   className = "",
+  type = "text",
 }: InputGroupProps) {
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
@@ -23,7 +25,7 @@ export function InputGroup({
         </span>
       )}
       <input
-        type="text"
+        type={type}
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
         placeholder={placeholder}

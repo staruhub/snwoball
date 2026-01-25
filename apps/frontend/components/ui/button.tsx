@@ -8,6 +8,8 @@ interface ButtonProps {
   icon?: ReactNode;
   onClick?: () => void;
   className?: string;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 }
 
 export function Button({
@@ -16,8 +18,10 @@ export function Button({
   icon,
   onClick,
   className = "",
+  type = "button",
+  disabled = false,
 }: ButtonProps) {
-  const baseClasses = "flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-medium";
+  const baseClasses = "flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-medium transition-opacity";
 
   const variantClasses = {
     primary: "bg-[var(--primary)] text-[var(--primary-foreground)]",
@@ -25,10 +29,14 @@ export function Button({
     ghost: "bg-[var(--muted)] text-[var(--foreground)]",
   };
 
+  const disabledClasses = disabled ? "opacity-50 cursor-not-allowed" : "";
+
   return (
     <button
+      type={type}
       onClick={onClick}
-      className={`${baseClasses} ${variantClasses[variant]} ${className}`}
+      disabled={disabled}
+      className={`${baseClasses} ${variantClasses[variant]} ${disabledClasses} ${className}`}
     >
       {icon}
       {children}
@@ -39,7 +47,7 @@ export function Button({
 interface IconButtonProps {
   icon: ReactNode;
   variant?: "ghost";
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
   className?: string;
 }
 
