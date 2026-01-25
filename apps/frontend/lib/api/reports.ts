@@ -189,3 +189,71 @@ export async function searchReports(keyword: string, limit: number = 5): Promise
   const result = await getReports({ keyword, pageSize: limit });
   return result.items;
 }
+
+/**
+ * 批量删除报告
+ */
+export async function batchDeleteReports(ids: string[]): Promise<void> {
+  await fetchApi<{ success: boolean }>("/api/v1/user-reports/batch-delete", {
+    method: "POST",
+    body: JSON.stringify({ ids }),
+  });
+}
+
+/**
+ * 获取回收站报告列表
+ */
+export async function getTrashReports(params?: ReportListParams): Promise<ReportListResponse> {
+  const query = buildQueryParams({
+    page: params?.page,
+    page_size: params?.pageSize,
+    keyword: params?.keyword,
+  });
+
+  const response = await fetchApi<BackendReportListResponse>(
+    `/api/v1/user-reports/trash${query}`
+  );
+
+  return {
+    total: response.total,
+    page: response.page,
+    pageSize: response.page_size,
+    items: response.items.map(transformBackendReport),
+  };
+}
+
+/**
+ * 将报告移入回收站
+ */
+export async function moveToTrash(id: string): Promise<void> {
+  await fetchApi<{ success: boolean }>(`/api/v1/user-reports/${id}/trash`, {
+    method: "POST",
+  });
+}
+
+/**
+ * 从回收站恢复报告
+ */
+export async function restoreFromTrash(id: string): Promise<void> {
+  await fetchApi<{ success: boolean }>(`/api/v1/user-reports/${id}/restore`, {
+    method: "POST",
+  });
+}
+
+/**
+ * 永久删除报告（从回收站）
+ */
+export async function permanentlyDelete(id: string): Promise<void> {
+  await fetchApi<{ success: boolean }>(`/api/v1/user-reports/${id}/permanent`, {
+    method: "DELETE",
+  });
+}
+
+/**
+ * 清空回收站
+ */
+export async function emptyTrash(): Promise<void> {
+  await fetchApi<{ success: boolean }>("/api/v1/user-reports/trash/empty", {
+    method: "DELETE",
+  });
+}

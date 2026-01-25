@@ -60,6 +60,7 @@ interface ReportEditorState {
   updateModuleTitle: (moduleId: string, title: string) => void;
   updateModuleConfig: (moduleId: string, config: Partial<Record<string, unknown>>) => void;
   toggleModuleLock: (moduleId: string) => void;
+  batchUpdateModules: (moduleIds: string[], updates: Partial<Pick<ModuleInstance, 'height' | 'isLocked'>>) => void;
 
   // 配置操作
   updateConfig: (config: Partial<ReportConfig>) => void;
@@ -216,6 +217,16 @@ export const useReportEditorStore = create<ReportEditorState>((set, get) => ({
     set({
       modules: modules.map((m) =>
         m.id === moduleId ? { ...m, isLocked: !m.isLocked } : m
+      ),
+      isDirty: true,
+    });
+  },
+
+  batchUpdateModules: (moduleIds, updates) => {
+    const { modules } = get();
+    set({
+      modules: modules.map((m) =>
+        moduleIds.includes(m.id) ? { ...m, ...updates } : m
       ),
       isDirty: true,
     });
