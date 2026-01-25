@@ -1,0 +1,18 @@
+{
+  "name": "snowball",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm run --parallel dev:frontend dev:backend",
+    "dev:frontend": "pnpm --filter @snowball/frontend dev",
+    "dev:backend": "cd apps/backend && python modules/web/web_bootstrap.py local",
+    "build": "pnpm --filter @snowball/frontend build",
+    "lint": "pnpm --filter @snowball/frontend lint",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  }
+}

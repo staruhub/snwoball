@@ -1,0 +1,25 @@
+import type { Metadata } from "next";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "基金报告系统",
+  description: "基金分析报告生成系统",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="zh-CN" className="h-full">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&family=Roboto+Mono&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="h-full font-primary">{children}</body>
+    </html>
+  );
+}
