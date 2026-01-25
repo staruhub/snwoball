@@ -40,3 +40,6 @@ export {
   getBenchmarks,
   getActiveBenchmarks,
 } from "./fund";
+
+// 认证 API
+export * from "./auth";
