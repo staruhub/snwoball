@@ -1,0 +1,3 @@
+[submodule "apps/frontend/ratel-mind-web"]
+	path = apps/frontend/ratel-mind-web
+	url = https://github.com/staruhub/snwoball.git

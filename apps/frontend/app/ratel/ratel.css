@@ -1,0 +1,5 @@
+@import "../../ratel-mind-web/src/index.css";
+
+.ratel-app {
+  min-height: 100vh;
+}

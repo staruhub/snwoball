@@ -4,6 +4,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { TopNavbar, TemplateSelectModal } from "@/components/features/workspace";
 import { useWorkspaceStore, useUserStore } from "@/stores";
+import { useIframeMode } from "@/hooks/useIframeMode";
 
 interface WorkspaceLayoutProps {
   children: ReactNode;
@@ -14,6 +15,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
   const { isTemplateModalOpen, setTemplateModalOpen } = useWorkspaceStore();
   const { isAuthenticated } = useUserStore();
   const [isChecking, setIsChecking] = useState(true);
+  const { isIframe } = useIframeMode();
 
   // 路由保护：未登录重定向到登录页
   useEffect(() => {
@@ -43,7 +45,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
   return (
     <div className="flex flex-col h-screen bg-[var(--background)]">
       {/* 顶部导航栏 */}
-      <TopNavbar />
+      {!isIframe && <TopNavbar />}
 
       {/* 主内容区 */}
       <main className="flex-1 overflow-auto">{children}</main>

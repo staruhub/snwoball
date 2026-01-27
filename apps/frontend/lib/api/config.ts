@@ -1,6 +1,7 @@
 /**
  * API 配置和通用请求函数
  */
+import { isIframe, notifyParent } from "@/lib/iframe";
 
 // Admin API (端口 8002)
 export const API_BASE_URL =
@@ -47,6 +48,10 @@ export async function fetchApi<T>(
   });
 
   if (!response.ok) {
+    if (response.status === 401 && isIframe()) {
+      notifyParent({ type: "AUTH_EXPIRED" });
+    }
+
     const error: ApiError = {
       status: response.status,
       message: `API Error: ${response.status} ${response.statusText}`,
@@ -129,6 +134,10 @@ export async function fetchWebApi<T>(
   });
 
   if (!response.ok) {
+    if (response.status === 401 && isIframe()) {
+      notifyParent({ type: "AUTH_EXPIRED" });
+    }
+
     const error: ApiError = {
       status: response.status,
       message: `API Error: ${response.status} ${response.statusText}`,

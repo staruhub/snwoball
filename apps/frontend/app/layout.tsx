@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
+import IframeAdapter from "@/components/IframeAdapter";
+import IframeTokenReceiver from "@/components/IframeTokenReceiver";
 
 export const metadata: Metadata = {
   title: "基金报告系统",
@@ -21,7 +23,11 @@ export default function RootLayout({
         />
       </head>
       <body className="h-full font-primary">
-        <ToastProvider>{children}</ToastProvider>
+        <ToastProvider>
+          <IframeAdapter />
+          <IframeTokenReceiver />
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );
