@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 import IframeAdapter from "@/components/IframeAdapter";
@@ -32,7 +33,9 @@ export default function RootLayout({
         <ToastProvider>
           <AuthSyncProvider>
             <IframeAdapter />
-            <IframeTokenReceiver />
+            <Suspense fallback={null}>
+              <IframeTokenReceiver />
+            </Suspense>
             {children}
           </AuthSyncProvider>
         </ToastProvider>
