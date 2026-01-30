@@ -2,7 +2,7 @@
  * 模板 API
  */
 
-import { fetchApi, buildQueryParams } from "./config";
+import { fetchWebApi, buildQueryParams } from "./config";
 
 // ==================== 类型定义 ====================
 
@@ -111,7 +111,7 @@ export async function getTemplates(params?: TemplateListParams): Promise<Templat
     keyword: params?.keyword,
   });
 
-  const response = await fetchApi<BackendTemplateListResponse>(
+  const response = await fetchWebApi<BackendTemplateListResponse>(
     `/api/v1/templates${query}`
   );
 
@@ -135,7 +135,7 @@ export async function getTemplates(params?: TemplateListParams): Promise<Templat
  * 注意：当前使用 is_default 字段作为"推荐模板"的替代
  */
 export async function getFavoriteTemplates(): Promise<Template[]> {
-  const response = await fetchApi<BackendTemplateListResponse>(
+  const response = await fetchWebApi<BackendTemplateListResponse>(
     "/api/v1/templates"
   );
 
@@ -150,7 +150,7 @@ export async function getFavoriteTemplates(): Promise<Template[]> {
  */
 export async function getTemplate(id: string): Promise<Template | null> {
   try {
-    const response = await fetchApi<BackendTemplateItem>(
+    const response = await fetchWebApi<BackendTemplateItem>(
       `/api/v1/templates/${id}`
     );
     return transformBackendTemplate(response);

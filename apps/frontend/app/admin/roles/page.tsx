@@ -1,5 +1,8 @@
 "use client";
 
+// 强制动态渲染，因为使用了客户端功能
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Search } from "lucide-react";
 import { RoleTable } from "@/components/features/admin/role-table";
@@ -42,12 +45,13 @@ export default function RolesPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // 从认证 Hook 获取 token
-  const { token, requireAuth } = useAuth();
+  const { token, requireAuth, isLoading } = useAuth();
 
   // 认证检查
   useEffect(() => {
-    requireAuth();
-  }, [requireAuth]);
+    if (isLoading) return;
+    requireAuth("/admin/login");
+  }, [requireAuth, isLoading]);
 
   const fetchRoles = useCallback(async () => {
     if (!token) return;

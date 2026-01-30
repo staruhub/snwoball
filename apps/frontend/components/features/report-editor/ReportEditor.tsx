@@ -32,9 +32,7 @@ export function ReportEditor({ reportId, initialData }: ReportEditorProps) {
   // 模拟保存函数
   const handleSave = useCallback(async () => {
     // TODO: 实现实际的保存 API 调用
-    console.log('Saving report...');
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log('Report saved!');
   }, []);
 
   // 自动保存
@@ -46,7 +44,6 @@ export function ReportEditor({ reportId, initialData }: ReportEditorProps) {
   // 导出处理
   const handleExport = useCallback(() => {
     // TODO: 打开导出弹窗
-    console.log('Opening export dialog...');
   }, []);
 
   // 初始化

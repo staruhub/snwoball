@@ -1,8 +1,5 @@
-# workspace Specification
+## ADDED Requirements
 
-## Purpose
-TBD - created by archiving change init-fund-report-system. Update Purpose after archive.
-## Requirements
 ### Requirement: Workspace Layout
 
 The system SHALL provide a workspace home page as the main entry point for users.
@@ -19,7 +16,7 @@ The system SHALL display a persistent top navigation bar.
 #### Scenario: Navigation bar elements
 
 - **WHEN** user views any page
-- **THEN** navigation bar displays logo, global search, notification icon, and user avatar dropdown
+- **THEN** navigation bar displays: Logo/产品名称, 全局搜索, 消息通知, 用户头像下拉
 
 #### Scenario: User avatar dropdown menu
 
@@ -76,7 +73,7 @@ The system SHALL display user's recent reports on workspace.
 #### Scenario: Report card information
 
 - **WHEN** user views a report card
-- **THEN** card shows report name, associated fund, last edit time, status (草稿/已完成), and action buttons (编辑/复制/删除)
+- **THEN** card shows: 报告名称, 关联基金, 最后编辑时间, 报告状态(草稿/已完成), 操作按钮(编辑/复制/删除)
 
 #### Scenario: Edit report from card
 
@@ -91,6 +88,11 @@ The system SHALL display user's favorite templates on workspace.
 
 - **WHEN** user views workspace
 - **THEN** system displays user's favorited templates as cards
+
+#### Scenario: Template card information
+
+- **WHEN** user views a template card
+- **THEN** card shows: 模板名称, 模板类型(周报/月报/专项), 创建时间, 使用此模板按钮
 
 #### Scenario: Use favorite template
 
@@ -109,5 +111,23 @@ The system SHALL optionally display market data overview on workspace when enabl
 #### Scenario: Display northbound capital flow
 
 - **WHEN** market overview is enabled
-- **THEN** system displays latest northbound capital flow data
+- **THEN** system displays latest northbound capital flow data (北向资金流向)
 
+#### Scenario: Display hot sectors
+
+- **WHEN** market overview is enabled
+- **THEN** system displays today's hot sectors (今日热点板块)
+
+### Requirement: Message Notifications
+
+The system SHALL display message notifications to users.
+
+#### Scenario: Display notification icon
+
+- **WHEN** user views navigation bar
+- **THEN** notification icon shows unread message count
+
+#### Scenario: View notifications
+
+- **WHEN** user clicks notification icon
+- **THEN** system displays notification dropdown with recent messages

@@ -2,7 +2,7 @@
  * 报告 API
  */
 
-import { fetchApi, buildQueryParams } from "./config";
+import { fetchWebApi, buildQueryParams } from "./config";
 
 // ==================== 类型定义 ====================
 
@@ -15,6 +15,7 @@ export interface Report {
   createdAt: string;
   updatedAt: string;
   thumbnailUrl?: string;
+  deletedAt?: string;
 }
 
 export interface ReportListParams {
@@ -50,6 +51,7 @@ interface BackendReportItem {
   content: Record<string, unknown> | null;
   thumbnail_url: string | null;
   user_id: string;
+  deleted_at: string | null;
   create_time: string;
   update_time: string;
 }
@@ -73,6 +75,7 @@ function transformBackendReport(r: BackendReportItem): Report {
     createdAt: r.create_time,
     updatedAt: r.update_time,
     thumbnailUrl: r.thumbnail_url || undefined,
+    deletedAt: r.deleted_at || undefined,
   };
 }
 
@@ -82,7 +85,7 @@ function transformBackendReport(r: BackendReportItem): Report {
  * 获取最近报告列表
  */
 export async function getRecentReports(limit: number = 10): Promise<Report[]> {
-  const response = await fetchApi<BackendReportItem[]>(
+  const response = await fetchWebApi<BackendReportItem[]>(
     `/api/v1/user-reports/recent?limit=${limit}`
   );
   return response.map(transformBackendReport);
@@ -99,7 +102,7 @@ export async function getReports(params?: ReportListParams): Promise<ReportListR
     keyword: params?.keyword,
   });
 
-  const response = await fetchApi<BackendReportListResponse>(
+  const response = await fetchWebApi<BackendReportListResponse>(
     `/api/v1/user-reports${query}`
   );
 
@@ -116,7 +119,7 @@ export async function getReports(params?: ReportListParams): Promise<ReportListR
  */
 export async function getReport(id: string): Promise<Report | null> {
   try {
-    const response = await fetchApi<BackendReportItem>(
+    const response = await fetchWebApi<BackendReportItem>(
       `/api/v1/user-reports/${id}`
     );
     return transformBackendReport(response);
@@ -129,7 +132,7 @@ export async function getReport(id: string): Promise<Report | null> {
  * 创建新报告
  */
 export async function createReport(params: CreateReportParams): Promise<Report> {
-  const response = await fetchApi<BackendReportItem>("/api/v1/user-reports", {
+  const response = await fetchWebApi<BackendReportItem>("/api/v1/user-reports", {
     method: "POST",
     body: JSON.stringify({
       name: params.name,
@@ -148,7 +151,7 @@ export async function createReportFromTemplate(
   templateId: string,
   params?: { name?: string; fundId?: string; fundName?: string }
 ): Promise<Report> {
-  const response = await fetchApi<BackendReportItem>(
+  const response = await fetchWebApi<BackendReportItem>(
     `/api/v1/user-reports/from-template/${templateId}`,
     {
       method: "POST",
@@ -166,7 +169,7 @@ export async function createReportFromTemplate(
  * 复制报告
  */
 export async function duplicateReport(id: string): Promise<Report> {
-  const response = await fetchApi<BackendReportItem>(
+  const response = await fetchWebApi<BackendReportItem>(
     `/api/v1/user-reports/${id}/duplicate`,
     { method: "POST" }
   );
@@ -177,7 +180,7 @@ export async function duplicateReport(id: string): Promise<Report> {
  * 删除报告
  */
 export async function deleteReport(id: string): Promise<void> {
-  await fetchApi<{ success: boolean }>(`/api/v1/user-reports/${id}`, {
+  await fetchWebApi<{ success: boolean }>(`/api/v1/user-reports/${id}`, {
     method: "DELETE",
   });
 }
@@ -188,4 +191,48 @@ export async function deleteReport(id: string): Promise<void> {
 export async function searchReports(keyword: string, limit: number = 5): Promise<Report[]> {
   const result = await getReports({ keyword, pageSize: limit });
   return result.items;
+}
+
+// ==================== 回收站相关 API ====================
+
+/**
+ * 获取回收站报告列表
+ */
+export async function getTrashReports(params?: {
+  page?: number;
+  pageSize?: number;
+}): Promise<ReportListResponse> {
+  const query = buildQueryParams({
+    page: params?.page,
+    page_size: params?.pageSize,
+  });
+
+  const response = await fetchWebApi<BackendReportListResponse>(
+    `/api/v1/user-reports/trash/list${query}`
+  );
+
+  return {
+    total: response.total,
+    page: response.page,
+    pageSize: response.page_size,
+    items: response.items.map(transformBackendReport),
+  };
+}
+
+/**
+ * 还原报告（从回收站恢复）
+ */
+export async function restoreReport(id: string): Promise<void> {
+  await fetchWebApi<{ success: boolean }>(`/api/v1/user-reports/${id}/restore`, {
+    method: "POST",
+  });
+}
+
+/**
+ * 永久删除报告
+ */
+export async function permanentlyDeleteReport(id: string): Promise<void> {
+  await fetchWebApi<{ success: boolean }>(`/api/v1/user-reports/${id}/permanently`, {
+    method: "DELETE",
+  });
 }

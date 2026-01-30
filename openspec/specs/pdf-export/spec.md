@@ -1,8 +1,5 @@
-# pdf-export Specification
+## ADDED Requirements
 
-## Purpose
-TBD - created by archiving change init-fund-report-system. Update Purpose after archive.
-## Requirements
 ### Requirement: Export Dialog
 
 The system SHALL provide an export configuration dialog.
@@ -12,10 +9,10 @@ The system SHALL provide an export configuration dialog.
 - **WHEN** user clicks "导出" button in editor
 - **THEN** system displays export configuration modal
 
-#### Scenario: Export dialog options
+#### Scenario: Export dialog elements
 
 - **WHEN** export dialog is open
-- **THEN** user sees: 报告名称 input, 导出模板 dropdown, 导出类型 selection, 导出尺寸 selection
+- **THEN** user sees: 报告名称输入框, 导出模板下拉, 导出类型选择, 导出尺寸选择, 导出范围, 其他选项
 
 ### Requirement: Export Configuration
 
@@ -29,17 +26,23 @@ The system SHALL allow configuring export settings.
 #### Scenario: Select export template
 
 - **WHEN** user selects export template
-- **THEN** system applies selected template's styling to export
+- **THEN** system applies selected template styling
+- **AND** options include: 系统默认导出模板, 我的导出模板
 
 #### Scenario: Select export type
 
 - **WHEN** user selects export type
-- **THEN** available options are: PDF (current), Word (V2.0), PPT (V2.0), Excel (数据)
+- **THEN** available options are: PDF, Word(V2.0), PPT(V2.0), Excel(仅数据)
 
 #### Scenario: Select export size
 
 - **WHEN** user selects export size
 - **THEN** available options are: A4纵向, A4横向, 无纸张大小限制
+
+#### Scenario: Select export range
+
+- **WHEN** user selects export range
+- **THEN** available options are: 全部模块, 选中模块
 
 ### Requirement: Export Content Options
 
@@ -59,11 +62,6 @@ The system SHALL allow selecting export content options.
 
 - **WHEN** user enables "包含页码" option
 - **THEN** exported PDF shows page numbers on each page
-
-#### Scenario: Export range selection
-
-- **WHEN** user selects export range
-- **THEN** options are: 全部模块, 选中模块
 
 ### Requirement: PDF Generation
 
@@ -106,7 +104,7 @@ The system SHALL generate table of contents based on navigation settings.
 #### Scenario: TOC with module names
 
 - **WHEN** "导航中显示底层控件名字" is enabled
-- **THEN** TOC shows individual module names (e.g., "滚动夏普")
+- **THEN** TOC shows individual module names (e.g., "滚动夏普比率")
 
 #### Scenario: TOC page links
 
@@ -153,11 +151,10 @@ The system SHALL allow managing export templates.
 
 #### Scenario: Save export template
 
-- **WHEN** user configures export settings
+- **WHEN** user clicks save after configuring export settings
 - **THEN** user can save configuration as personal export template
 
 #### Scenario: Use saved template
 
 - **WHEN** user selects saved export template
 - **THEN** export settings are populated from template
-

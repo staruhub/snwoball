@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { Card } from "@/components/ui/card";
 import { PasswordChangeForm } from "@/components/features/settings";
 import { useUserStore } from "@/stores";

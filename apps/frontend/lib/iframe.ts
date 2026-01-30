@@ -24,7 +24,7 @@ export const getAllowedParentOrigins = () => {
     return raw
       .split(",")
       .map((origin) => origin.trim())
-      .filter(Boolean);
+      .filter((origin) => origin && origin !== "*");
   }
 
   const inferred = getParentOrigin();
@@ -37,6 +37,14 @@ export const notifyParent = (payload: unknown) => {
   }
 
   const allowedOrigins = getAllowedParentOrigins();
-  const targetOrigin = allowedOrigins.length > 0 ? allowedOrigins[0] : "*";
+  const parentOrigin = getParentOrigin();
+  const targetOrigin = parentOrigin
+    ? allowedOrigins.find((origin) => origin === parentOrigin) || allowedOrigins[0]
+    : allowedOrigins[0];
+
+  if (!targetOrigin) {
+    return;
+  }
+
   window.parent.postMessage(payload, targetOrigin);
 };

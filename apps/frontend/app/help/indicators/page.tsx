@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState } from "react";
 import { Search, ChevronDown, ChevronRight, Info } from "lucide-react";
 import { Card } from "@/components/ui/card";

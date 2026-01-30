@@ -1,5 +1,8 @@
 "use client";
 
+// 强制动态渲染，因为使用了客户端功能
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Search, MoreHorizontal, Edit, Trash2, Upload, Download, Eye } from "lucide-react";
 import { Modal, ConfirmModal } from "@/components/ui/modal";
@@ -76,12 +79,13 @@ export default function TemplatesPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // 从认证 Hook 获取 token
-  const { token, requireAuth } = useAuth();
+  const { token, requireAuth, isLoading } = useAuth();
 
   // 认证检查
   useEffect(() => {
-    requireAuth();
-  }, [requireAuth]);
+    if (isLoading) return;
+    requireAuth("/admin/login");
+  }, [requireAuth, isLoading]);
 
   const fetchTemplates = useCallback(async () => {
     if (!token) return;

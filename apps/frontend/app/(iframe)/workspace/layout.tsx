@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { TopNavbar, TemplateSelectModal } from "@/components/features/workspace";
 import { useWorkspaceStore, useUserStore } from "@/stores";
 import { useIframeMode } from "@/hooks/useIframeMode";
@@ -12,22 +12,27 @@ interface WorkspaceLayoutProps {
 
 export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { isTemplateModalOpen, setTemplateModalOpen } = useWorkspaceStore();
-  const { isAuthenticated } = useUserStore();
+  const { isAuthenticated, _hasHydrated } = useUserStore();
   const [isChecking, setIsChecking] = useState(true);
   const { isIframe } = useIframeMode();
 
-  // 路由保护：未登录重定向到登录页
+  // 路由保护：未登录重定向到 ratel-mind-web 登录页
   useEffect(() => {
+    if (!_hasHydrated) {
+      return;
+    }
     if (!isAuthenticated) {
-      router.replace('/login');
+      const currentPath = pathname || "/";
+      router.replace(`/ratel/login?redirect=${encodeURIComponent(currentPath)}`);
     } else {
       setIsChecking(false);
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, _hasHydrated, pathname]);
 
   // 检查登录状态时显示加载状态
-  if (isChecking && !isAuthenticated) {
+  if (!_hasHydrated || (isChecking && !isAuthenticated)) {
     return (
       <div className="flex items-center justify-center h-screen bg-[var(--background)]">
         <div className="flex flex-col items-center gap-4">

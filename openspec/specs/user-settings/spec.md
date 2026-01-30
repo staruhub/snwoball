@@ -1,8 +1,5 @@
-# user-settings Specification
+## ADDED Requirements
 
-## Purpose
-TBD - created by archiving change init-fund-report-system. Update Purpose after archive.
-## Requirements
 ### Requirement: Personal Information Management
 
 The system SHALL allow users to manage their personal information.
@@ -10,7 +7,7 @@ The system SHALL allow users to manage their personal information.
 #### Scenario: View personal info
 
 - **WHEN** user navigates to 个人信息 page
-- **THEN** system displays: avatar, name, phone, email, organization, job title
+- **THEN** system displays: 头像, 姓名, 手机号, 邮箱, 所属机构, 职位
 
 #### Scenario: Upload avatar
 
@@ -111,7 +108,7 @@ The system SHALL track user operations for audit purposes.
 #### Scenario: View login history
 
 - **WHEN** user navigates to 操作日志 page
-- **THEN** system displays login records with time, IP, device info
+- **THEN** system displays login records with: 时间, IP地址, 设备信息
 
 #### Scenario: View report operations
 
@@ -136,4 +133,3 @@ The system SHALL persist user preferences across sessions.
 
 - **WHEN** user logs in on different device
 - **THEN** same preferences are applied
-

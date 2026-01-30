@@ -1,34 +1,180 @@
+version: '3.8'
+
 services:
+  # ============================================
+  # 基础设施服务
+  # ============================================
+
+  # PostgreSQL 数据库
   postgres:
     image: postgres:15
     container_name: snowball-postgres
+    restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: snowball
-      POSTGRES_USER: snowball
-      POSTGRES_PASSWORD: snowball123
+      POSTGRES_DB: ${DB_NAME:-ratel_mind}
+      POSTGRES_USER: ${DB_USER:-ratel}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ratel123}
+      TZ: Asia/Shanghai
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U snowball -d snowball"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-ratel} -d ${DB_NAME:-ratel_mind}"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
+    networks:
+      - snowball-network
 
+  # Redis 缓存
   redis:
-    image: redis:7
+    image: redis:7-alpine
     container_name: snowball-redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    command: redis-server --appendonly yes
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - snowball-network
 
+  # ============================================
+  # 后端服务
+  # ============================================
+
+  # Web API 服务 (端口 8003)
+  backend-web:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile.dev
+    container_name: snowball-backend-web
+    restart: unless-stopped
+    ports:
+      - "8003:8003"
+    environment:
+      - PROFILE=docker
+      - SERVICE_MODULE=web
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-ratel_mind}
+      - DB_USER=${DB_USER:-ratel}
+      - DB_PASSWORD=${DB_PASSWORD:-ratel123}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SECRET_KEY=${SECRET_KEY:-snowball-docker-secret-key}
+    volumes:
+      - ./apps/backend/logs:/app/logs
+      - ./apps/backend/certs:/app/certs:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - snowball-network
+    command: ["python", "modules/web/web_bootstrap.py", "docker"]
+
+  # Admin API 服务 (端口 8002)
+  backend-admin:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile.dev
+    container_name: snowball-backend-admin
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    environment:
+      - PROFILE=docker
+      - SERVICE_MODULE=admin
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-ratel_mind}
+      - DB_USER=${DB_USER:-ratel}
+      - DB_PASSWORD=${DB_PASSWORD:-ratel123}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SECRET_KEY=${SECRET_KEY:-snowball-docker-secret-key}
+    volumes:
+      - ./apps/backend/logs:/app/logs
+      - ./apps/backend/certs:/app/certs:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - snowball-network
+    command: ["python", "modules/admin/admin_bootstrap.py", "docker"]
+
+  # ============================================
+  # 前端服务
+  # ============================================
+
+  # Next.js 前端 (端口 3000)
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://localhost:8002
+        - NEXT_PUBLIC_WEB_API_URL=http://localhost:8003
+    container_name: snowball-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:8002
+      - NEXT_PUBLIC_WEB_API_URL=http://localhost:8003
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8003
+      - NEXT_PUBLIC_SNOWBALL_URL=http://localhost:3000
+    depends_on:
+      backend-web:
+        condition: service_healthy
+      backend-admin:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - snowball-network
+
+# ============================================
+# 网络配置
+# ============================================
+networks:
+  snowball-network:
+    driver: bridge
+
+# ============================================
+# 数据卷配置
+# ============================================
 volumes:
   postgres_data:
+    driver: local
   redis_data:
+    driver: local

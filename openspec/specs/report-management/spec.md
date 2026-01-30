@@ -1,8 +1,5 @@
-# report-management Specification
+## ADDED Requirements
 
-## Purpose
-TBD - created by archiving change init-fund-report-system. Update Purpose after archive.
-## Requirements
 ### Requirement: Report List View
 
 The system SHALL provide a report management center with list view.
@@ -15,7 +12,12 @@ The system SHALL provide a report management center with list view.
 #### Scenario: Toggle view mode
 
 - **WHEN** user clicks view toggle button
-- **THEN** system switches between table view and card view
+- **THEN** system switches between table view (表格) and card view (卡片)
+
+#### Scenario: Report item information
+
+- **WHEN** user views a report item
+- **THEN** item shows: 报告名称, 报告类型, 关联基金, 创建人, 最后编辑时间, 状态
 
 ### Requirement: Report Filtering
 
@@ -77,50 +79,41 @@ The system SHALL allow batch operations on reports.
 #### Scenario: Batch delete
 
 - **WHEN** user selects multiple reports and clicks "批量删除"
-- **THEN** system moves all selected reports to trash
+- **THEN** system moves all selected reports to trash after confirmation
 
 #### Scenario: Batch archive
 
 - **WHEN** user selects multiple reports and clicks "批量归档"
 - **THEN** system marks all selected reports as archived
 
-### Requirement: Report CRUD Operations
+### Requirement: Report Operations
 
-The system SHALL support creating, reading, updating, and deleting reports.
+The system SHALL support individual report operations.
 
-#### Scenario: Create report
+#### Scenario: Edit report
 
-- **WHEN** user creates a new report
-- **THEN** system generates unique report ID and saves initial configuration
+- **WHEN** user clicks "编辑" on a report
+- **THEN** user is navigated to report editor with that report loaded
 
-#### Scenario: Read report
+#### Scenario: Copy report
 
-- **WHEN** user opens a report
-- **THEN** system loads all report data including modules, parameters, and styles
+- **WHEN** user clicks "复制" on a report
+- **THEN** system creates a copy with name "{original} (副本)"
 
-#### Scenario: Update report
+#### Scenario: Export report
 
-- **WHEN** user edits and saves a report
-- **THEN** system updates report data and records last edit time
+- **WHEN** user clicks "导出" on a report
+- **THEN** system opens export configuration dialog
+
+#### Scenario: Share report
+
+- **WHEN** user clicks "分享" on a report
+- **THEN** system generates shareable link with optional expiration
 
 #### Scenario: Delete report
 
-- **WHEN** user deletes a report
-- **THEN** report is moved to trash (soft delete)
-
-### Requirement: Report Sharing
-
-The system SHALL allow users to share reports.
-
-#### Scenario: Generate share link
-
-- **WHEN** user clicks "分享" on a report
-- **THEN** system generates a shareable link with optional expiration
-
-#### Scenario: Access shared report
-
-- **WHEN** recipient opens share link
-- **THEN** recipient can view report in read-only mode
+- **WHEN** user clicks "删除" on a report
+- **THEN** report is moved to trash (soft delete) after confirmation
 
 ### Requirement: Trash Management
 
@@ -128,7 +121,7 @@ The system SHALL provide a trash for deleted reports.
 
 #### Scenario: View trash
 
-- **WHEN** user navigates to trash page
+- **WHEN** user navigates to trash page (回收站)
 - **THEN** system displays all soft-deleted reports
 
 #### Scenario: Restore report
@@ -145,4 +138,3 @@ The system SHALL provide a trash for deleted reports.
 
 - **WHEN** report has been in trash for more than 30 days
 - **THEN** system automatically permanently deletes it
-

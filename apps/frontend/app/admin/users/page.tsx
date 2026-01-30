@@ -1,5 +1,8 @@
 "use client";
 
+// 强制动态渲染，因为使用了客户端功能
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Search } from "lucide-react";
 import { UserTable } from "@/components/features/admin/user-table";
@@ -42,12 +45,13 @@ export default function UsersPage() {
   const [actionLoading, setActionLoading] = useState(false);
 
   // 从认证 Hook 获取 token
-  const { token, requireAuth } = useAuth();
+  const { token, requireAuth, isLoading } = useAuth();
 
   // 认证检查
   useEffect(() => {
-    requireAuth();
-  }, [requireAuth]);
+    if (isLoading) return;
+    requireAuth("/admin/login");
+  }, [requireAuth, isLoading]);
 
   const fetchUsers = useCallback(async () => {
     if (!token) return;

@@ -11,65 +11,57 @@ import { useUserStore } from '@/stores/useUserStore';
 export function useAuth() {
   const router = useRouter();
   const pathname = usePathname();
-  const { token, isAuthenticated, logout: storeLogout } = useUserStore();
+  const { token, isAuthenticated, _hasHydrated, logout: storeLogout } = useUserStore();
 
   /**
    * 检查认证状态，未认证时重定向到登录页
+   * @param redirectTo 重定向目标，默认为 ratel-mind-web 登录页
    */
-  const requireAuth = useCallback(() => {
+  const requireAuth = useCallback((redirectTo?: string) => {
+    // 等待 hydration 完成
+    if (!_hasHydrated) {
+      return true; // 还在加载中，暂时不重定向
+    }
     if (!isAuthenticated || !token) {
-      router.replace('/admin/login');
+      const currentPath = pathname || '/';
+      const target =
+        redirectTo ?? `/ratel/login?redirect=${encodeURIComponent(currentPath)}`;
+      router.replace(target);
       return false;
     }
     return true;
-  }, [isAuthenticated, token, router]);
+  }, [isAuthenticated, token, router, _hasHydrated, pathname]);
 
   /**
    * 登出并重定向到登录页
+   * @param redirectTo 重定向目标，默认为 ratel-mind-web 登录页
    */
-  const logout = useCallback(() => {
+  const logout = useCallback((redirectTo: string = '/ratel/login') => {
     storeLogout();
-    router.replace('/admin/login');
+    router.replace(redirectTo);
   }, [storeLogout, router]);
 
   /**
    * 用于页面级别的认证守卫
    * 在 useEffect 中使用，自动检查并重定向
+   * @param redirectTo 重定向目标，默认为 ratel-mind-web 登录页
    */
-  const useAuthGuard = useCallback(() => {
-    if (!isAuthenticated || !token) {
-      router.replace('/admin/login');
+  const useAuthGuard = useCallback((redirectTo: string = '/ratel/login') => {
+    // 等待 hydration 完成
+    if (!_hasHydrated) {
+      return;
     }
-  }, [isAuthenticated, token, router]);
+    if (!isAuthenticated || !token) {
+      router.replace(redirectTo);
+    }
+  }, [isAuthenticated, token, router, _hasHydrated]);
 
   return {
     token,
     isAuthenticated,
+    isLoading: !_hasHydrated,
     requireAuth,
     logout,
     useAuthGuard,
   };
-}
-
-/**
- * 认证守卫 Hook
- * 在 Admin 页面中使用，自动检查认证状态
- */
-export function useAuthGuard() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { token, isAuthenticated } = useUserStore();
-
-  useEffect(() => {
-    // 跳过登录页面的检查
-    if (pathname === '/admin/login') {
-      return;
-    }
-
-    if (!isAuthenticated || !token) {
-      router.replace('/admin/login');
-    }
-  }, [isAuthenticated, token, pathname, router]);
-
-  return { token, isAuthenticated };
 }

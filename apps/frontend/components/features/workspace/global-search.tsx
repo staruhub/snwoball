@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { FileText, LayoutTemplate, TrendingUp } from "lucide-react";
 import { SearchDropdown } from "@/components/ui/search-input";
@@ -16,6 +16,7 @@ export function GlobalSearch({ className = "" }: GlobalSearchProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GlobalSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const debouncedQuery = useDebounce(query, 300);
 
@@ -25,20 +26,45 @@ export function GlobalSearch({ className = "" }: GlobalSearchProps) {
       return;
     }
 
+    // 取消之前的请求
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    // 创建新的 AbortController
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
     const search = async () => {
       setLoading(true);
       try {
         const data = await globalSearch(debouncedQuery);
-        setResults(data);
+        // 只在未被取消时更新结果
+        if (!abortController.signal.aborted) {
+          setResults(data);
+        }
       } catch (error) {
+        // 忽略 AbortError
+        if ((error as Error).name === 'AbortError') {
+          return;
+        }
         console.error("Search error:", error);
-        setResults([]);
+        if (!abortController.signal.aborted) {
+          setResults([]);
+        }
       } finally {
-        setLoading(false);
+        if (!abortController.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     search();
+
+    // 清理函数：取消请求
+    return () => {
+      abortController.abort();
+    };
   }, [debouncedQuery]);
 
   const handleSelect = useCallback(

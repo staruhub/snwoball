@@ -1,8 +1,5 @@
-# template-management Specification
+## ADDED Requirements
 
-## Purpose
-TBD - created by archiving change init-fund-report-system. Update Purpose after archive.
-## Requirements
 ### Requirement: Template Categories
 
 The system SHALL organize templates into categories.
@@ -26,20 +23,20 @@ The system SHALL provide pre-built system templates.
 - **WHEN** user selects "系统模板" tab
 - **THEN** system displays official pre-built templates
 
-#### Scenario: System template properties
+#### Scenario: System template card
 
-- **WHEN** user views a system template
-- **THEN** user can see template preview image, name, module count, and usage count
+- **WHEN** user views a system template card
+- **THEN** card shows: 模板预览图, 模板名称, 包含模块数, 使用次数
+
+#### Scenario: System template operations
+
+- **WHEN** user views system template operations
+- **THEN** available actions are: 使用, 预览, 收藏 (edit and delete are not available)
 
 #### Scenario: Use system template
 
 - **WHEN** user clicks "使用" on system template
-- **THEN** system creates new report based on that template
-
-#### Scenario: Cannot edit system templates
-
-- **WHEN** user views system template
-- **THEN** edit and delete options are not available
+- **THEN** system creates new report based on that template and opens editor
 
 ### Requirement: Personal Templates
 
@@ -53,7 +50,7 @@ The system SHALL allow users to create and manage personal templates.
 #### Scenario: Template save dialog
 
 - **WHEN** template save dialog is shown
-- **THEN** user can enter template name, description, category, and upload cover image
+- **THEN** user can enter: 模板名称, 模板描述, 模板分类, 模板封面(上传或自动截图)
 
 #### Scenario: Create personal template
 
@@ -77,16 +74,16 @@ The system SHALL allow users to preview templates before using.
 #### Scenario: Open preview
 
 - **WHEN** user clicks "预览" on any template
-- **THEN** system displays template preview modal
+- **THEN** system displays template preview modal/page
 
 #### Scenario: Preview content
 
-- **WHEN** template preview modal is open
-- **THEN** user sees template basic info, included modules list, and visual preview of layout
+- **WHEN** template preview is open
+- **THEN** user sees: 模板基本信息, 包含模块列表, 模板预览画布
 
 #### Scenario: Use from preview
 
-- **WHEN** user clicks "使用此模板创建报告" in preview modal
+- **WHEN** user clicks "使用此模板创建报告" in preview
 - **THEN** system creates new report and opens editor
 
 ### Requirement: Template Favorites
@@ -116,4 +113,3 @@ The system SHALL track template usage statistics.
 
 - **WHEN** user views template card
 - **THEN** template usage count is displayed
-

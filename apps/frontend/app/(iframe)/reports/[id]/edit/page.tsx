@@ -1,4 +1,6 @@
-'use client';
+"use client";
+
+export const dynamic = "force-dynamic";
 
 import { use } from 'react';
 import { ReportEditor } from '@/components/features/report-editor';

@@ -1,8 +1,5 @@
-# user-auth Specification
+## ADDED Requirements
 
-## Purpose
-TBD - created by archiving change init-fund-report-system. Update Purpose after archive.
-## Requirements
 ### Requirement: User Login
 
 The system SHALL provide multiple login methods for users to access the platform.
@@ -69,3 +66,17 @@ The system SHALL allow users to recover their passwords.
 - **WHEN** user sets new password via reset link
 - **THEN** password is updated and user is redirected to login page
 
+### Requirement: User Registration
+
+The system SHALL allow new users to register accounts.
+
+#### Scenario: Display registration form
+
+- **WHEN** user navigates to registration page
+- **THEN** system displays form with: enterprise info, personal info, qualification upload
+
+#### Scenario: Complete registration
+
+- **WHEN** user submits valid registration form
+- **THEN** account is created and pending approval
+- **AND** user receives confirmation notification

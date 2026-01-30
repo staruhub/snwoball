@@ -1,5 +1,8 @@
 "use client";
 
+// 强制动态渲染，因为使用了客户端功能
+export const dynamic = "force-dynamic";
+
 import { Users, Shield, LayoutGrid, FileText } from "lucide-react";
 
 interface StatCardProps {

@@ -3,10 +3,16 @@ import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 import IframeAdapter from "@/components/IframeAdapter";
 import IframeTokenReceiver from "@/components/IframeTokenReceiver";
+import { AuthSyncProvider } from "@/components/AuthSyncProvider";
 
 export const metadata: Metadata = {
   title: "基金报告系统",
   description: "基金分析报告生成系统",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -24,9 +30,11 @@ export default function RootLayout({
       </head>
       <body className="h-full font-primary">
         <ToastProvider>
-          <IframeAdapter />
-          <IframeTokenReceiver />
-          {children}
+          <AuthSyncProvider>
+            <IframeAdapter />
+            <IframeTokenReceiver />
+            {children}
+          </AuthSyncProvider>
         </ToastProvider>
       </body>
     </html>

@@ -2,7 +2,7 @@
  * 通知 API
  */
 
-import { fetchApi } from "./config";
+import { fetchWebApi } from "./config";
 
 // ==================== 类型定义 ====================
 
@@ -97,14 +97,14 @@ export function getNotificationTypeLabel(type: NotificationType): string {
  */
 export async function getNotifications(limit?: number): Promise<NotificationListResponse> {
   const pageSize = limit || 20;
-  const response = await fetchApi<BackendMessageListResponse>(
+  const response = await fetchWebApi<BackendMessageListResponse>(
     `/api/v1/messages/page?page=1&page_size=${pageSize}&client_type=web`
   );
 
   const items = response.items.map(transformBackendMessage);
 
   // 获取未读数量
-  const unreadResponse = await fetchApi<BackendUnreadCountResponse>(
+  const unreadResponse = await fetchWebApi<BackendUnreadCountResponse>(
     "/api/v1/messages/unread-count?client_type=web"
   );
 
@@ -119,7 +119,7 @@ export async function getNotifications(limit?: number): Promise<NotificationList
  * 获取未读通知数量
  */
 export async function getUnreadCount(): Promise<number> {
-  const response = await fetchApi<BackendUnreadCountResponse>(
+  const response = await fetchWebApi<BackendUnreadCountResponse>(
     "/api/v1/messages/unread-count?client_type=web"
   );
   return response.unread_count;
@@ -132,7 +132,7 @@ export async function markAsRead(ids: string[]): Promise<void> {
   // 后端 API 一次只能标记一条消息
   await Promise.all(
     ids.map((id) =>
-      fetchApi<{ success: boolean }>(`/api/v1/messages/${id}/read`, {
+      fetchWebApi<{ success: boolean }>(`/api/v1/messages/${id}/read`, {
         method: "POST",
       })
     )
@@ -144,7 +144,7 @@ export async function markAsRead(ids: string[]): Promise<void> {
  */
 export async function markAllAsRead(): Promise<void> {
   // 获取所有未读消息然后标记
-  const response = await fetchApi<BackendMessageListResponse>(
+  const response = await fetchWebApi<BackendMessageListResponse>(
     "/api/v1/messages/page?page=1&page_size=100&client_type=web"
   );
 

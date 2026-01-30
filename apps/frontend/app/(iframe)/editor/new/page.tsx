@@ -2,6 +2,10 @@
 
 import { EditorContent } from "@/components/features/report-editor/editor-content";
 
+// 强制动态渲染，不进行静态生成
+// 因为 EditorContent 使用了 useSearchParams
+export const dynamic = "force-dynamic";
+
 /**
  * 新建报告页面
  *

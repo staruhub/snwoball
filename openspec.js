@@ -1,0 +1,1 @@
+/opt/homebrew/Cellar/node/25.4.0/lib/node_modules/@fission-ai/openspec/bin/openspec.js

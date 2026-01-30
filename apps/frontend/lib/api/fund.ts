@@ -2,7 +2,7 @@
  * 基金 API 模块
  */
 
-import { fetchApi, buildQueryParams } from "./config";
+import { fetchWebApi, buildQueryParams } from "./config";
 import type {
   FundListResponse,
   FundProfile,
@@ -27,14 +27,20 @@ export async function getPublicFunds(
     page_size: params?.page_size,
     keyword: params?.keyword,
   });
-  return fetchApi<FundListResponse>(`/api/v1/fund/public-funds${queryString}`);
+  return fetchWebApi<FundListResponse>(
+    `/api/v1/fund/public-funds${queryString}`,
+    { skipAuth: true }
+  );
 }
 
 /**
- * 获取基金详情
+ * 获取基金详情（公开接口）
  */
 export async function getFundProfile(fundId: string): Promise<FundProfile> {
-  return fetchApi<FundProfile>(`/api/v1/fund/profiles/${fundId}`);
+  return fetchWebApi<FundProfile>(
+    `/api/v1/fund/profiles/${fundId}`,
+    { skipAuth: true }
+  );
 }
 
 /**
@@ -49,8 +55,9 @@ export async function getPerformanceComparison(
     start_date: params.start_date,
     end_date: params.end_date,
   });
-  return fetchApi<PerformanceComparisonResponse>(
-    `/api/v1/fund/performance/compare${queryString}`
+  return fetchWebApi<PerformanceComparisonResponse>(
+    `/api/v1/fund/performance/compare${queryString}`,
+    { skipAuth: true }
   );
 }
 
@@ -66,30 +73,39 @@ export async function getComprehensiveMetrics(
     start_date: params.start_date,
     end_date: params.end_date,
   });
-  return fetchApi<ComprehensiveMetricsResponse>(
+  return fetchWebApi<ComprehensiveMetricsResponse>(
     `/api/v1/fund/performance/metrics${queryString}`
   );
 }
 
 /**
- * 获取基金概览
+ * 获取基金概览（公开接口）
  */
 export async function getFundOverview(
   fundId: string
 ): Promise<FundOverviewResponse> {
-  return fetchApi<FundOverviewResponse>(`/api/v1/fund/overview/${fundId}`);
+  return fetchWebApi<FundOverviewResponse>(
+    `/api/v1/fund/overview/${fundId}`,
+    { skipAuth: true }
+  );
 }
 
 /**
- * 获取基准列表
+ * 获取基准列表（公开接口）
  */
 export async function getBenchmarks(): Promise<BenchmarkListResponse> {
-  return fetchApi<BenchmarkListResponse>("/api/v1/fund/benchmarks");
+  return fetchWebApi<BenchmarkListResponse>(
+    "/api/v1/fund/benchmarks",
+    { skipAuth: true }
+  );
 }
 
 /**
  * 获取活跃的基准列表（公开接口）
  */
 export async function getActiveBenchmarks(): Promise<BenchmarkInfo[]> {
-  return fetchApi<BenchmarkInfo[]>("/api/v1/fund/benchmarks/active");
+  return fetchWebApi<BenchmarkInfo[]>(
+    "/api/v1/fund/benchmarks/active",
+    { skipAuth: true }
+  );
 }

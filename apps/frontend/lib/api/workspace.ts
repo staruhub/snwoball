@@ -28,13 +28,22 @@ export interface GlobalSearchResult {
 
 /**
  * 获取工作台概览数据
- * 聚合多个 API 的数据
+ * 聚合多个 API 的数据，使用容错处理确保部分失败不影响整体
  */
 export async function getWorkspaceOverview(): Promise<WorkspaceOverview> {
   const [recentReports, favoriteTemplates, unreadNotificationCount] = await Promise.all([
-    getRecentReports(10),
-    getFavoriteTemplates(),
-    getUnreadCount(),
+    getRecentReports(10).catch((error) => {
+      console.warn("获取最近报告失败:", error);
+      return [];
+    }),
+    getFavoriteTemplates().catch((error) => {
+      console.warn("获取收藏模板失败:", error);
+      return [];
+    }),
+    getUnreadCount().catch((error) => {
+      console.warn("获取未读通知数失败:", error);
+      return 0;
+    }),
   ]);
 
   return {
